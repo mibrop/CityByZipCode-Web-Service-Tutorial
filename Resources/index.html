@@ -1,0 +1,113 @@
+<html>
+<head>
+	<title>Find City By ZIP Code</title>
+
+<style>
+.centerDivs
+{
+	margin-right:auto;margin-left:auto;width:320px;
+}
+
+</style>
+<body style="background-color:#999999">
+	
+	<div id="txt_ZIPCode" class="centerDivs" style="width:100px; height:30px"></div>
+	<br/>
+	<div id="btn_Search"  class="centerDivs" style="width:100px; height:47px; color:#0000ff;"></div>
+	<br/><br/>
+	<div id="responseText"  class="centerDivs" style="width:300px; text-align:center; font-family:helvetica, impact, sans-serif; font-weight: bold;"></div>
+	<br/><br/><br/><br/>
+	<div id="instructions"  class="centerDivs" style="width:300px; text-align:center; font-family:helvetica, impact, sans-serif; font-weight: normal; font-size=8">
+		This Titanium Mobile iPhone Sample App demonstrates taking user input, submitting it to a web service call, parsing the returned data, and displaying it, including some basic error trapping.<br/><br/>by Mike Brophy (@mikebrophy)</br>Sysgain Inc.
+	</div>
+
+
+
+	<script>
+
+	// Declare our globals
+	var xhr = Titanium.Network.createHTTPClient();
+	var xmlCity;
+	var xmlState;
+	var zipCode;
+    var _responseSection = document.getElementById("responseText");
+
+	var tf2 = Titanium.UI.createTextField({
+		id:'txt_ZIPCode',
+		value:'',
+		color:'#336699',
+		backgroundColor:'#eeeeee',
+		returnKeyType:Titanium.UI.RETURNKEY_DONE,
+		enableReturnKey:true,
+		keyboardType:Titanium.UI.KEYBOARD_NUMBER_PAD,
+		autocorrect:false,
+		hintText:'Enter ZIP',
+		textAlign:'left',
+		clearOnEdit:true,
+		borderStyle:Titanium.UI.INPUT_BORDERSTYLE_BEZEL,
+		clearButtonMode:Titanium.UI.INPUT_BUTTONMODE_NEVER,
+	});
+	tf2.addEventListener('change',function(e)
+	{
+		tf2.value = e.value;
+	});
+	
+	var _btn_Search = Titanium.UI.createButton({
+	    id:'btn_Search',
+	    title:'Search',
+	});
+
+	_btn_Search.addEventListener('click',function(e)
+	{
+		constructAndSend();
+	});
+	
+	
+	
+	xhr.onload = function()
+	{
+	   var xml = this.responseXML;
+	   // xml now is a Javascript DOM object you can use
+  	   var xmlDoc = xml.documentElement;
+
+	   try {
+	   		// get a value of the first tag myelement found in XML doc
+	   		xmlCity = xmlDoc.getElementsByTagName("CITY")[0].childNodes[0].nodeValue;
+	   		xmlState = xmlDoc.getElementsByTagName("STATE")[0].childNodes[0].nodeValue;
+	   } catch(err) {
+		   _responseSection.innerHTML = "";
+		
+			var a = Titanium.UI.createAlertDialog();
+			a.setTitle("Error");
+			a.setMessage("ZIP Code not found.");
+			a.show();
+			return;	
+		
+	   }
+	
+	   _responseSection.innerHTML = zipCode + "<br>is the ZIP Code for<br>" + xmlCity + ", " + xmlState;
+
+	
+	};
+	
+
+
+	function constructAndSend(){
+		    zipCode = tf2.value;
+		
+		    if ( zipCode != null && zipCode.length == 5 ){
+				xhr.open("GET","http://www.webservicex.net/uszip.asmx/GetInfoByZIP?USZip=" + zipCode);
+				xhr.send(null);
+			} else {
+				var a = Titanium.UI.createAlertDialog();
+				a.setTitle("Error");
+				a.setMessage("A 5-digit ZIP Code must be entered.");
+				a.show();
+			}
+	}
+
+	</script>
+
+
+</body>
+</html>
